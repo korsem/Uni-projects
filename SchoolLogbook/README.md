@@ -1,4 +1,4 @@
-#School Logbook
+# School Logbook
 This Program prints information about a student/students with the highest average grade from school and prints how many students get certain number of prices.
 Prices are given on a certain criterium:
 highest average grade in school, highest average grade in a group, highest number of grades >= 5 and behavior grade = 6.
@@ -28,5 +28,5 @@ thisGroup() - prints out the information about a group,
 
 It is worth noting that in my program main I create the array of 8 Groups which represents school.
 
-#What I have learned
+# What I have learned
 This projects taught me a lot about the classes and indicators, and tables of indicators, and that it is good to take some brakes during a day from coding.

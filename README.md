@@ -1,2 +1,2 @@
-# Uni-projects
-Some of my university projects
+# University projects
+Some of my programming homework/projects.

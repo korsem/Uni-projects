@@ -10,10 +10,11 @@ number of given Prices,
 a list of the grades obtained (range of each grade 1-6),
 number of grades
 
-Group is the class which stores indicators on Students in the Group and current number of Students in the group (max number of 30) and groupID.
+Group class stores indicators on Students in the Group and current number of Students in the group (max number of 30) and groupID.
 
 Information about the students is read from a file, where each row in the file is in given form:
 [GroupID] [Grade on behavior] [number of grades] [grade_1] [grade_2] ... [grade_n] - where 'n' is the number of grades
+I read it from an exemplary file - "students.txt"
 
 Addictionally, most important methods in a class Student are:
 avgGrade() - calculates average of Student's grade,

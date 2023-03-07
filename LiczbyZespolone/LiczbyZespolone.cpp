@@ -236,7 +236,14 @@ LiczbaZespolona operator/(LiczbaZespolona &l, float x)
 // przeciazony operator << dla std::cout wyswietla zaokraglana liczbe zespolona do 3 cyfr po przecinku
 std::ostream& operator<<(std::ostream &stream, LiczbaZespolona &l)
 {
-    stream << setprecision(3) << l.rzeczywista << "+" << l.urojona << "i";
+    if(l.rzeczywista == 0 && l.urojona == 0)
+        stream << 0;
+    else if(l.rzeczywista == 0)
+        stream << setprecision(3) << l.urojona << "i";
+    else if(l.urojona == 0)
+        stream << setprecision(3) << l.rzeczywista;
+    else
+        stream << setprecision(3) << l.rzeczywista << "+" << l.urojona << "i";
     return stream;
 }
 
@@ -273,8 +280,15 @@ int main()
     cout << l1 << " - " << l2 << " = " << wynik << endl;
     wynik = l1 * l2;
     cout << l1 << " * " << l2 << " = " << wynik << endl;
+    try
+    {
     wynik = l1 / l2;
     cout << l1 << " / " << l2 << " = " << wynik << endl;
+    }
+    catch(std::exception &x)
+    {
+       cout << x.what() << endl;
+    }
 
     cout << endl;
 
@@ -284,7 +298,7 @@ int main()
     if(l1 > l2)
         cout << l1 << " jest wieksze od " << l2 << endl;
     else
-        cout << l2 << "jest wieksze od " << l1 << endl;
+        cout << l2 << " jest wieksze od " << l1 << endl;
 
     cout << endl;
 

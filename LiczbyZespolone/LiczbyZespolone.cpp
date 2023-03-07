@@ -3,6 +3,16 @@
 #include<iomanip>
 using namespace std;
 
+class dev_by0 : public std::exception{
+public:
+    dev_by0() : std::exception(){
+    }
+    const char * what() const noexcept override
+    {
+        return "Nie dziel przez 0";
+    }
+};
+
 class LiczbaZespolona
 {
 public:
@@ -30,6 +40,7 @@ public:
         this->urojona = urojona;
     }
 
+    //kontruktor kopiujacy
     LiczbaZespolona(const LiczbaZespolona &oryginal)
     {
         this -> rzeczywista = oryginal.rzeczywista;
@@ -46,7 +57,7 @@ public:
     //metoda obliczajaca modul liczby zespolonej
     float Modul()
     {
-        float m = rzeczywista*rzeczywista +  urojona*urojona;
+        float m = rzeczywista*rzeczywista + urojona*urojona;
         return sqrt(m);
     }
 
@@ -61,7 +72,6 @@ public:
             return 0;
     }
 };
-
 
 //operatory + i - jednoargumentowe
 LiczbaZespolona operator-(LiczbaZespolona &l)
@@ -98,7 +108,7 @@ LiczbaZespolona operator*(LiczbaZespolona &l1, LiczbaZespolona &l2)
 LiczbaZespolona operator/(LiczbaZespolona &l1, LiczbaZespolona &l2)
 {
     if(l2.rzeczywista == 0 && l2.urojona == 0)
-        return false;
+        throw dev_by0();
     else if(l2.urojona == 0)
     {
         return LiczbaZespolona(l1.rzeczywista/l2.rzeczywista, l1.urojona/l2.rzeczywista);
@@ -110,7 +120,7 @@ LiczbaZespolona operator/(LiczbaZespolona &l1, LiczbaZespolona &l2)
         LiczbaZespolona m = l2 * s;  //m - mianownik
         float b = m.rzeczywista;
         if(b == 0)
-            return 1; //obsluga bedu try catch
+            throw dev_by0();
         else
             return LiczbaZespolona(l.rzeczywista/b, l.urojona/b);
     }
@@ -218,6 +228,8 @@ LiczbaZespolona operator/(float x, LiczbaZespolona &l)
 
 LiczbaZespolona operator/(LiczbaZespolona &l, float x)
 {
+    if(x == 0)
+        throw dev_by0();
     return LiczbaZespolona(l.rzeczywista/x, l.urojona/x);
 }
 
@@ -228,17 +240,17 @@ std::ostream& operator<<(std::ostream &stream, LiczbaZespolona &l)
     return stream;
 }
 
-//metoda zwraca liczbe zespolona o module 1
+//metoda zwraca liczbe zespolona o module 1 (liczba zespolona jest traktowana jako wektor [a, b]
 LiczbaZespolona Normalizacja(LiczbaZespolona l)
+{
+    if(l.Modul() > 0)
     {
-        if(l.Modul() > 0)
-        {
-           float M = l.Modul();
-           l.rzeczywista = l.rzeczywista / M;
-           l.urojona = l.urojona / M;
-        }
-        return LiczbaZespolona(l.rzeczywista, l.urojona);
+        float M = l.Modul();
+        l.rzeczywista = l.rzeczywista / M;
+        l.urojona = l.urojona / M;
     }
+    return LiczbaZespolona(l.rzeczywista, l.urojona);
+}
 
 int main()
 {

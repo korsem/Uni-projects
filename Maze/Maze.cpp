@@ -1,7 +1,3 @@
-/*Wêze³ raz odwiedzony nie powinien byæ ca³kowicie ignorowany w obliczeniach.
-Mo¿e istnieæ wiêcej œcie¿ek do danego punktu na mapie, a krótsza œcie¿ka niekoniecznie zostanie wybrana jako pierwsza.
-*/
-
 #include <iostream>
 #include <algorithm>
 #include <queue>
@@ -9,22 +5,22 @@ Mo¿e istnieæ wiêcej œcie¿ek do danego punktu na mapie, a krótsza œcie¿ka
 
 using namespace std;
 
-//struktura Pole przechowuje wspolrzedne pola mapy
-struct Pole {
+//structure Position stores the coordinates of the maze
+struct Position {
     int a;
     int b;
 
-    Pole()
+    Position()
     {
         a = -1;
         b = -1;
     }
-    Pole(int a, int b)
+    Position(int a, int b)
     {
         this->a = a;
         this->b = b;
     }
-    bool istnieje()
+    bool exist()
     {
         if (a != -1 && b != -1)
             return true;
@@ -33,8 +29,8 @@ struct Pole {
     }
 };
 
-//przeciazenie operatora == sluzy do porownania dwoch pol
-bool operator==(Pole &p1, Pole &p2)
+//== compares two positions
+bool operator==(Position &p1, Position &p2)
 {
     if (p1.a == p2.a && p1.b == p2.b)
     {
@@ -44,94 +40,94 @@ bool operator==(Pole &p1, Pole &p2)
         return false;
 }
 
-//funkcja ta sluzy do wypisania nowych wartosci wokol Pola ostatnie do tablicy odl
-//uzupelnia wartosci talicy wokol Pola na ktorym aktualnie pracuje - ostatnie
-void fillOkolice(int **odl, int **wagi, bool **vis, int w, int h, Pole ostatnie)
+//this function is used to write new values around the field prev into the table dist
+//complete the values of the thallium around the field it is currently working on - prev
+void fillNeighbours(int **dist, int **weight, bool **vis, int w, int h, Position prev)
 {
-    vis[ostatnie.a][ostatnie.b] = true;
+    vis[prev.a][prev.b] = true;
 
     int dx[4] = {1, 0, -1, 0};
     int dy[4] = {0, 1, 0, -1};
 
     for(int i = 0; i < 4; i++)
     {
-        int x = ostatnie.a + dx[i];
-        int y = ostatnie.b + dy[i];
+        int x = prev.a + dx[i];
+        int y = prev.b + dy[i];
 
-        if(x >= 0 && x < h && y >= 0 && y < w &&  wagi[x][y] != 3)//sprawdzanie, czy nowe współrzędne są w granicach tablicy i czy pole nie jest przeszkodą
+        if(x >= 0 && x < h && y >= 0 && y < w &&  weight[x][y] != 3)//checking that the new coordinates are within the limits of the array and that Position is not an obstacle
         {
 
-            if(!vis[x][y]) //jeśli pole nie zostało odwiedzone, ustawiam odległość jako sumę odległości do ostatniego pola i wagi pola
+            if(!vis[x][y]) //if Position was not visited, I set the distance as a sum of the distance to the previous position and the value of the current position
             {
                 vis[x][y] = true;
-                odl[x][y] = odl[ostatnie.a][ostatnie.b] + wagi[x][y];
+                dist[x][y] = dist[prev.a][prev.b] + weight[x][y];
             }
-            else //jeśli pole zostało odwiedzone, ustawiam wartość na krótszą możliwą odległość
-                odl[x][y] = min(odl[x][y], odl[ostatnie.a][ostatnie.b] + wagi[x][y]);
+            else //if the position has been already visited I set the value of the dist to a shorter possible value
+                dist[x][y] = min(dist[x][y], dist[prev.a][prev.b] + weight[x][y]);
 
         }
     }
 }
 
-//funkcja dodaje do kolejki kolejne pola, na ktorych nastepnie bede wywolywac funkcje fillOkolice
-//wynikiem dzialania tej funkcji jest uzupelniona tablica odl
-//jest to funkcja rekurencyjna
-void bfs(int **odl, int **wagi, bool **visited, bool **vis, int w, int h, Pole ostatnie, Pole stop, queue<Pole> q)
+//the function adds further fields to the queue, on which I will then call the fillNeighbours function
+//the result of this function is a filled dist array
+//it is a recursive function
+void bfs(int **dist, int **weight, bool **visited, bool **vis, int w, int h, Position prev, Position stop, queue<Position> q)
 {
-    q.push(ostatnie); //do kolejki dodaje Pole startowe
-    visited[ostatnie.a][ostatnie.b] = true; //Zaznaczam je jako odwiedzone
-    fillOkolice(odl, wagi, vis, w, h, ostatnie);
+    q.push(prev); //start Position is added to a queue
+    visited[prev.a][prev.b] = true; //and is marked as visited
+    fillNeighbours(dist, weight, vis, w, h, prev);
 
-        Pole nowe = ostatnie; //zmienna pomocnicza przechowujaca pole na ktorym aktualnie pracuje
-        if(ostatnie.a < h-1)
+        Position current = prev; //auxiliary variable storing the currently used Position
+        if(prev.a < h-1)
         {
-            if(!visited[ostatnie.a+1][ostatnie.b])
+            if(!visited[prev.a+1][prev.b])
             {
-                visited[ostatnie.a + 1][ostatnie.b] = true;
-                q.push(Pole(ostatnie.a + 1, ostatnie.b));
-                nowe = Pole(ostatnie.a + 1,ostatnie.b);
-                bfs(odl, wagi, visited, vis, w, h, nowe, stop, q);
+                visited[prev.a + 1][prev.b] = true;
+                q.push(Position(prev.a + 1, prev.b));
+                current = Position(prev.a + 1,prev.b);
+                bfs(dist, weight, visited, vis, w, h, current, stop, q);
             }
         }
-        if(ostatnie.b < w-1)
+        if(prev.b < w-1)
         {
-            if(!visited[ostatnie.a][ostatnie.b+1])
+            if(!visited[prev.a][prev.b+1])
             {
-                visited[ostatnie.a][ostatnie.b + 1] = true;
-                q.push(Pole(ostatnie.a, ostatnie.b + 1));
-                nowe = Pole(ostatnie.a, ostatnie.b + 1);
-                bfs(odl, wagi, visited, vis, w, h, nowe, stop, q);
+                visited[prev.a][prev.b + 1] = true;
+                q.push(Position(prev.a, prev.b + 1));
+                current = Position(prev.a, prev.b + 1);
+                bfs(dist, weight, visited, vis, w, h, current, stop, q);
             }
         }
-        if(ostatnie.a > 0)
+        if(prev.a > 0)
         {
-            if(!visited[ostatnie.a - 1][ostatnie.b])
+            if(!visited[prev.a - 1][prev.b])
             {
-                visited[ostatnie.a - 1][ostatnie.b] = true;
-                q.push(Pole(ostatnie.a - 1, ostatnie.b));
-                nowe = Pole(ostatnie.a - 1,ostatnie.b);
-                bfs(odl, wagi, visited, vis, w, h, nowe, stop, q);
+                visited[prev.a - 1][prev.b] = true;
+                q.push(Position(prev.a - 1, prev.b));
+                current = Position(prev.a - 1,prev.b);
+                bfs(dist, weight, visited, vis, w, h, current, stop, q);
             }
         }
-        if(ostatnie.b > 0)
+        if(prev.b > 0)
         {
-            if(!visited[ostatnie.a][ostatnie.b - 1])
+            if(!visited[prev.a][prev.b - 1])
             {
-                visited[ostatnie.a][ostatnie.b - 1] = true;
-                q.push(Pole(ostatnie.a, ostatnie.b - 1));
-                nowe = Pole(ostatnie.a, ostatnie.b - 1);
-                bfs(odl, wagi, visited, vis, w, h, nowe, stop, q);
+                visited[prev.a][prev.b - 1] = true;
+                q.push(Position(prev.a, prev.b - 1));
+                current = Position(prev.a, prev.b - 1);
+                bfs(dist, weight, visited, vis, w, h, current, stop, q);
             }
         }
-        ostatnie = nowe;
+        prev = current;
 
-        //wedlug ustalonej przez kolejke kolejnosci uzupelniam tablice odl
-        if(ostatnie == stop)
+        //according to the order established by a queue the dist array is filled up
+        if(prev == stop)
         {
            while (!q.empty())
             {
-                Pole a = q.front();
-                fillOkolice(odl, wagi, vis, w, h, a);
+                Position a = q.front();
+                fillNeighbours(dist, weight, vis, w, h, a);
                 q.pop();
             }
         }
@@ -139,82 +135,88 @@ void bfs(int **odl, int **wagi, bool **visited, bool **vis, int w, int h, Pole o
 
 int main()
 {
-    int w, h; //szerokosc i wysokosc mapy
+    int w, h; //width and height of the maze
+    cout << "Input size of the maze: first width then height" << endl;
     cin >> w >> h;
-    char c; //znak
-    char mapa[h][w];
-    Pole start; //zmienna przechowuje wspolrzedna Pola startowego
-    Pole stop; //zmienna przechowuje wspolrzedna Pola koncowego
-    int x = 0;
-    //uzupelniam mape znakami
+    char maze[h][w]; //maze stores the chars meaning what kind of the terrain is certain position in the maze
+    Position start; //stores subordinates of the start position
+    Position stop; //stores subordinates of the target position
+    char c; //char representing the kind of terrain {'X', '_', '.', '0', '1'}
+    int x = 0; //stores the number of start positions and target positions (it should be 2)
+
+    cout << "Now you will fill the maze of size " << w << "x" << h << " with characters:" << endl;
+    cout << "'X' - inaccessible position," << endl;
+    cout << " '_' - regular terrain (value of 1)," << endl;
+    cout << "'.' - hard terrain (value of 2), " << endl;
+    cout << "'0' - start position (value of 1), " << endl;
+    cout << "'1' - target position (value of 1)" << endl;
+
+    //filling the maze
     for(int i = 0; i < h; i++)
     {
         for(int j = 0; j < w; j++)
         {
             cin >> c;
-            mapa[i][j] = c;
+            maze[i][j] = c;
             if(c == '0')
             {
-                start = Pole(i, j);
+                start = Position(i, j);
                 x++;
             }
             else if(c == '1')
             {
-                stop = Pole(i, j);
+                stop = Position(i, j);
                 x++;
             }
         }
     }
 
-    //moga byc tylko 2 znaki 0 lub 1 na mapie
-    if(x != 2)
+    //there needs t be exactly one start position and one target position on the maze
+    if((x != 2) && (!start.exist() || !stop.exist()))
     {
-        cout << -1;
+        cout << "there should be one start position and one target position in the maze" << endl;
+        return 1;
     }
-    //jesli nie istnieje pole startowe lub koncowe zwracam -1
-    else if(!start.istnieje() || !stop.istnieje())
-    {
-        cout << -1;
-    }
+
     else
     {
-        //tablica przechowuje wagi znakow z mapy
-        int **wagi = new int*[h];
+        //array stores th values of the positions in the maze
+        int **weight = new int*[h];
         for (int i = 0; i < h; i++)
         {
-            wagi[i] = new int[w];
+            weight[i] = new int[w];
         }
          for(int i = 0; i < h; i++)
         {
             for(int j = 0; j < w; j++)
             {
-                if(mapa[i][j] == '.')
-                    wagi[i][j] = 2;
-                else if(mapa[i][j] == 'X')
-                    wagi[i][j] = 3; //wartosc 3 oznacza X, czyli Pole na ktore nie mozna wchodzic
+                if(maze[i][j] == '.')
+                    weight[i][j] = 2;
+                else if(maze[i][j] == 'X')
+                    weight[i][j] = 3; //value of 3 means the position is not accessible
                 else
-                    wagi[i][j] = 1;
+                    weight[i][j] = 1;
             }
         }
 
-        //tablica odl przechowuje najkrotsze odleglosci do konkretnego pola
-        int **odl = new int*[h];
+        //dist array stores the shortest distances to the certain position
+        int **dist = new int*[h];
         for (int i = 0; i < h; i++)
         {
-            odl[i] = new int[w];
+            dist[i] = new int[w];
         }
             for(int i = 0; i < h; i++)
         {
             for(int j = 0; j < w; j++)
             {
-                odl[i][j] = INT_MAX; //ustawiam wartosci odleglosci poczatkowa na INT_MAX jak nieskonczonosc jak w algorytmie dikstry
+                dist[i][j] = INT_MAX; //I set the starting values of dist array to INT_MAX
             }
         }
-        odl[start.a][start.b] = 1; //ustawiam wartosc (start zawsze bedzie mial wartosc 1)
+        dist[start.a][start.b] = 1; //I set the value of starting position (the value of it is always 1)
 
-        //tablice przechowuje informacje ktore pola zostaly odwiedzone
-        bool** visited = new bool*[h]; //wykorzystuje do bfs
-        bool** vis = new bool*[h]; //wykorzystuje do fillOkolice
+        //these arrays stores the information if the each position was yet visited
+        bool** visited = new bool*[h]; //used for bfs
+        bool** vis = new bool*[h]; //used for fillNeighbours
         for(int i = 0; i < h; i++)
         {
             visited[i] = new bool[w];
@@ -224,9 +226,9 @@ int main()
         {
             for(int j = 0; j < w; j++)
             {
-                if(wagi[i][j] == 3)
+                if(weight[i][j] == 3)
                     {
-                        visited[i][j] = true; //ustawiam wartosci z X na odwiedzone
+                        visited[i][j] = true; //I set the value of inaccessible position to visited
                         vis[i][j] = true;
                     }
                 else
@@ -237,29 +239,28 @@ int main()
             }
         }
 
-        //kolejka q bedzie przechowywac kolejnosc pol ktore bede "przeszukiwac"
-        queue<Pole> q;
+        //the q queue will store the order of the fields to be "searched"
+        queue<Position> q;
 
-        //wywoluje bfs
-        //ustawi mi najkrotsze drogi do poszczegolnych Pol mapy, ktore wykorzystuje do okreslenia odleglosci do Pola stop
-        bfs(odl, wagi, visited, vis, w, h, start, stop, q);
+        //bfs function will set the values of the shortest distances to the each positions of the maze that I use to set the value from the start position to the stop position
+        bfs(dist, weight, visited, vis, w, h, start, stop, q);
 
-        //wyswietlam wynik
-        if(odl[stop.a][stop.b] == INT_MAX) //jesli nie ma drogi do stopu, wyswietlam -1
-            cout << -1;
+        //result
+        if(dist[stop.a][stop.b] == INT_MAX)
+            cout << "No path from the start position to the target position" << endl;
         else
-            cout << odl[stop.a][stop.b]; //wyswietlam odleglosc do stopu
+            cout << dist[stop.a][stop.b];
 
-        //zwalniam pamiec moich tablic
+        //free the memory
         for (int i = 0; i < h; i++)
         {
-            delete [] odl[i];
-            delete [] wagi[i];
+            delete [] dist[i];
+            delete [] weight[i];
             delete [] visited[i];
             delete [] vis[i];
         }
-        delete [] odl;
-        delete [] wagi;
+        delete [] dist;
+        delete [] weight;
         delete [] visited;
         delete [] vis;
         }

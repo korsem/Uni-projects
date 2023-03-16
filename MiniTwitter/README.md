@@ -21,12 +21,12 @@ Jeśli wpis o tym numerze nie istnieje informuje o tym użytkownika i kończy pr
 jeśli taki wpis istnieje zwiększa jego licznik polubień o 1.
 
 Między klientem, a serwerem jest przekazywana struktura my_data, w której przechowuję:
-  int typ - informacja o tym czy istnieją już jakies posty,
-  char txt[MY_MSG_SIZE] - zawartosc posta ("tweet"),
-  int likes - ilość lików pod postem,
-  char user[16] - nazwa użytkownika dodającego post,
-  int nr - numer posta,
-  int max - maksymalna ilosc postow
+  int typ - informacja o tym czy istnieją już jakies posty, 
+  char txt[MY_MSG_SIZE] - zawartosc posta ("tweet"), 
+  int likes - ilość lików pod postem, 
+  char user[16] - nazwa użytkownika dodającego post, 
+  int nr - numer posta, 
+  int max - maksymalna ilosc postow 
 
 # Co mogę dodać 
 1) dostęp synchronizowany poprzez semafory

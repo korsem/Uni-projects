@@ -56,6 +56,9 @@ int main(int argc, char *argv[]) //pierwszy parametr to nazwa pliku, a drugi to 
     else
     {
 	    printf("Twitter 2.0 \n");
+        printf("Aby wyświetlić wszystke posty: Ctrl^Z \n");
+        printf("Aby zamknąć program: Ctrl^C \n");
+
         int n; //zminnna przechowuje maksymalna liczbe wiadmosci
         sscanf(argv[2], "%d", &n);
         if(n <= 0)
@@ -87,7 +90,7 @@ int main(int argc, char *argv[]) //pierwszy parametr to nazwa pliku, a drugi to 
             exit(1);
         }
 
-        shared_data->typ = 0; // typ == 0 oznacza, ze nic jeszcze nie ma
+        shared_data->typ = 0; // typ == 0 oznacza, ze nie ma jeszcze postów
 	    shared_data->nr = 0; //poczatkowo jest 0 postw
 	    shared_data->max = n;//w pamieci wspolnej zapisuje ile maksymalnie moze byc postow
 	    while(8)
@@ -98,6 +101,5 @@ int main(int argc, char *argv[]) //pierwszy parametr to nazwa pliku, a drugi to 
             }
             sleep(1);
         }
-
      }
 }

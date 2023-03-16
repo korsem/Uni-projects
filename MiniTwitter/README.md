@@ -2,8 +2,8 @@
 Mini Twitter jest jednym z moich projektów zaliczeniowych na przedmiot Sieci komputerowe.
 Mini Twitter składa sie z programów klienta i serwera realizujące mini serwis ,,Twitter 2.0'' za pomocą pamięci dzielonej Systemu V
 
-Mój program zawiera 2 pliki:
-1)Serwer:
+Mój program zawiera 2 pliki:<br /> 
+Serwer: 
 Uruchamiany jest z dwoma parametrami: nazwa pliku (służącą do generowania klucza IPC, System V) oraz liczba całkowita n oznaczająca maksymalną liczbę wiadomości
 Serwer tworzy klucz IPC na podstawie nazwy podanej jako argument powyżej i korzystając z powyższego klucza (lub nazwy) tworzy segment pamięci dzielonej zawierający n rekordów (,,slotów'') do przechowywania wpisów. Dodatkowo, każdy rekord w serwisie zawiera nazwę użytkownika klienta i jego wpis oraz liczbę polubień
 Serwer czeka na sygnały od użytkownika:
